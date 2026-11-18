@@ -1,0 +1,615 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HAUZ SYSTEM</title>
+<style>
+:root{--bg:#0b0b14;--panel:#141422;--panel2:#1c1b2d;--line:#302d48;--txt:#f5f2ff;--muted:#aaa5c2;--pink:#f28acb;--purple:#9b83ff;--green:#5bd6a2;--red:#ff7188}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(circle at 15% 0,#29203c 0,transparent 35%),var(--bg);color:var(--txt);font:15px system-ui,-apple-system,Segoe UI,sans-serif}
+button,input,select{font:inherit}
+button{border:0;cursor:pointer;color:#171321;background:linear-gradient(110deg,var(--pink),var(--purple));padding:11px 15px;border-radius:11px;font-weight:750}
+button.secondary{background:#29263e;color:var(--txt);border:1px solid var(--line)}
+button.danger{background:#542637;color:#ffdce4;border:1px solid #8a3c55}
+button:disabled{opacity:.45;cursor:not-allowed}
+input,select{width:100%;padding:12px;border-radius:10px;border:1px solid var(--line);background:#0f0e19;color:var(--txt);outline:none}
+label{display:block;color:var(--muted);font-size:13px;margin:12px 0 6px}
+.muted{color:var(--muted)}
+.small{font-size:12px}
+.hidden{display:none!important}
+.auth{min-height:100vh;display:grid;place-items:center;padding:20px}
+.authbox{width:min(440px,100%);background:#151423;border:1px solid var(--line);border-radius:22px;padding:26px;box-shadow:0 25px 80px #0008}
+.logo{font-size:25px;font-weight:950;letter-spacing:2px;background:linear-gradient(90deg,var(--pink),var(--purple));color:transparent;background-clip:text}
+.authbox h1{margin:8px 0}
+.tabs{display:flex;gap:8px;margin:18px 0}
+.tabs button{flex:1}
+#app{display:grid;grid-template-columns:245px 1fr;min-height:100vh}
+.side{background:#11111d;border-right:1px solid var(--line);padding:20px 14px;position:sticky;top:0;height:100vh;overflow:auto}
+.side .logo{padding:5px 10px 20px}
+.nav{display:grid;gap:6px}
+.nav button{background:transparent;color:var(--muted);text-align:left;font-weight:600;border:1px solid transparent}
+.nav button.active,.nav button:hover{background:#252139;color:white;border-color:var(--line)}
+.main{min-width:0}
+.top{height:72px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 25px;gap:12px;background:#0c0b16d9;position:sticky;top:0;z-index:3;backdrop-filter:blur(12px)}
+.wallet{background:#211d35;border:1px solid var(--line);padding:9px 13px;border-radius:12px;font-weight:800}
+.content{padding:25px;max-width:1400px;margin:auto}
+.pagehead{display:flex;align-items:end;justify-content:space-between;gap:15px;margin-bottom:20px}
+.pagehead h1{margin:0;font-size:26px}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.card{background:linear-gradient(145deg,#191829,#12121e);border:1px solid var(--line);border-radius:17px;padding:18px;min-width:0}
+.card h3{margin:0 0 8px}
+.stat{font-size:27px;font-weight:900;margin-top:8px}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.between{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.stack{display:grid;gap:10px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.three{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.item{padding:12px;border:1px solid var(--line);border-radius:12px;background:#11111c;margin-top:9px}
+.item p{margin:5px 0}
+.tag{font-size:11px;border-radius:20px;padding:4px 8px;background:#29243d;color:#d9ceff}
+.good{color:var(--green)}
+.bad{color:var(--red)}
+.tablewrap{overflow:auto}
+table{width:100%;border-collapse:collapse;min-width:500px}
+th,td{text-align:left;padding:11px;border-bottom:1px solid var(--line);font-size:13px}
+th{color:var(--muted)}
+.qr{width:190px;height:190px;margin:15px auto;background:white;color:#222;display:grid;place-items:center;border-radius:12px;text-align:center;padding:15px;font-weight:900}
+.notice{padding:12px;border-radius:12px;background:#27213b;border:1px solid #4c416e;color:#dcd3ff;margin:12px 0}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.menu-toggle{display:none}
+@media(max-width:850px){
+#app{grid-template-columns:1fr}
+.side{height:auto;position:relative;padding:10px 12px;border-right:0;border-bottom:1px solid var(--line)}
+.side .logo{padding:5px 8px}
+.nav{display:flex;overflow:auto}
+.nav button{white-space:nowrap}
+.top{height:62px;padding:0 14px}
+.content{padding:16px}
+.grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+.two{grid-template-columns:1fr}
+}
+@media(max-width:520px){
+.grid,.three{grid-template-columns:1fr}
+.pagehead{align-items:start;flex-direction:column}
+.top{font-size:13px}
+.wallet{padding:7px 9px}
+.authbox{padding:20px}
+}
+</style>
+</head>
+<body>
+
+<section id="auth" class="auth">
+ <div class="authbox">
+  <div class="logo">HAUZ SYSTEM</div>
+  <h1 id="authTitle">Đăng nhập</h1>
+  <p class="muted">Nền tảng quản lý bot, thành viên và kho key.</p>
+  <div class="tabs">
+   <button id="loginTab" onclick="showAuth('login')">Đăng nhập</button>
+   <button class="secondary" id="registerTab" onclick="showAuth('register')">Tạo tài khoản</button>
+  </div>
+  <div id="loginForm">
+   <label>Tên tài khoản</label>
+   <input id="loginUser" autocomplete="username" placeholder="Nhập tài khoản">
+   <label>Mật khẩu</label>
+   <input id="loginPass" type="password" autocomplete="current-password" placeholder="Nhập mật khẩu">
+   <button style="width:100%;margin-top:18px" onclick="login()">Đăng nhập</button>
+   <p class="muted small">Demo mặc định: tài khoản <b>haune</b>, mật khẩu <b>haune</b>. Hãy đổi thông tin khi triển khai thật.</p>
+  </div>
+  <div id="registerForm" class="hidden">
+   <label>Tên tài khoản</label>
+   <input id="regUser" placeholder="Tạo tên tài khoản">
+   <label>Mật khẩu</label>
+   <input id="regPass" type="password" placeholder="Tạo mật khẩu">
+   <button style="width:100%;margin-top:18px" onclick="register()">Tạo tài khoản</button>
+  </div>
+  <p id="authMsg" class="small bad"></p>
+ </div>
+</section>
+
+<div id="app" class="hidden">
+ <aside class="side">
+  <div class="logo">HAUZ SYSTEM</div>
+  <div class="nav" id="nav">
+   <button data-page="dashboard" class="active" onclick="page('dashboard',this)">⌂ Tổng quan</button>
+   <button data-page="bots" onclick="page('bots',this)">◈ Quản lý bot</button>
+   <button data-page="rooms" onclick="page('rooms',this)">▦ Phòng</button>
+   <button data-page="games" onclick="page('games',this)">♠ Trò chơi</button>
+   <button data-page="keys" onclick="page('keys',this)">⌑ Kho key</button>
+   <button data-page="live" onclick="page('live',this)">◉ Live mô phỏng</button>
+   <button data-page="deposit" onclick="page('deposit',this)">＋ Nạp tiền</button>
+   <button data-page="buy" onclick="page('buy',this)">▣ Mua key</button>
+   <button data-page="wallet" onclick="page('wallet',this)">◇ Ví & giao dịch</button>
+   <button data-page="exchange" onclick="page('exchange',this)">⇄ Thu mua xu</button>
+   <button data-page="members" onclick="page('members',this)">♙ Thành viên</button>
+   <button data-page="logs" onclick="page('logs',this)">☷ Nhật ký bot</button>
+   <button data-page="security" onclick="page('security',this)">⬡ An ninh</button>
+   <button data-page="admin" onclick="page('admin',this)">⚙ Admin</button>
+  </div>
+ </aside>
+ <main class="main">
+  <header class="top">
+   <div><b id="hello">Xin chào</b> <span class="tag" id="roleTag">MEMBER</span></div>
+   <div class="row">
+    <div class="wallet">Số dư: <span id="balance">0</span>đ</div>
+    <button class="secondary" onclick="logout()">Thoát</button>
+   </div>
+  </header>
+  <div class="content" id="view"></div>
+ </main>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const load=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}};
+const save=()=>{
+ localStorage.setItem('hz_users',JSON.stringify(users));
+ localStorage.setItem('hz_keys',JSON.stringify(keys));
+ localStorage.setItem('hz_logs',JSON.stringify(logs));
+ localStorage.setItem('hz_tx',JSON.stringify(txs));
+ localStorage.setItem('hz_rooms',JSON.stringify(rooms));
+ localStorage.setItem('hz_bots',JSON.stringify(bots));
+ localStorage.setItem('hz_wallet',JSON.stringify(wallets));
+};
+
+let users=load('hz_users',[
+ {u:'haune',p:'haune',role:'admin',balance:0,blocked:false},
+ {u:'ctv_demo',p:'123456',role:'ctv',balance:0,blocked:false}
+]);
+let keys=load('hz_keys',[]);
+let logs=load('hz_logs',[]);
+let txs=load('hz_tx',[]);
+let rooms=load('hz_rooms',[]);
+let bots=load('hz_bots',[]);
+let wallets=load('hz_wallet',{});
+let current=null,activePage='dashboard',qrTimer=null,wrong=0,liveCoins=0;
+
+function log(msg){
+ logs.unshift({time:new Date().toLocaleString('vi-VN'),user:current?.u||'SYSTEM',msg});
+ logs=logs.slice(0,250);
+ save();
+}
+
+function showAuth(mode){
+ $('loginForm').classList.toggle('hidden',mode!=='login');
+ $('registerForm').classList.toggle('hidden',mode!=='register');
+ $('authTitle').textContent=mode==='login'?'Đăng nhập':'Tạo tài khoản';
+ $('loginTab').className=mode==='login'?'':'secondary';
+ $('registerTab').className=mode==='register'?'':'secondary';
+ $('authMsg').textContent='';
+}
+
+function login(){
+ let u=users.find(x=>x.u===$('loginUser').value.trim()&&x.p===$('loginPass').value);
+ if(!u){$('authMsg').textContent='Sai tài khoản hoặc mật khẩu.';return}
+ if(u.blocked){$('authMsg').textContent='Tài khoản đang bị khóa. Liên hệ admin.';return}
+ current=u;
+ wrong=0;
+ $('auth').classList.add('hidden');
+ $('app').classList.remove('hidden');
+ $('hello').textContent='Xin chào, '+u.u;
+ $('roleTag').textContent=u.role.toUpperCase();
+ refreshTop();
+ page('dashboard');
+ log('Đăng nhập thành công');
+}
+
+function register(){
+ let u=$('regUser').value.trim(),p=$('regPass').value;
+ if(u.length<3||p.length<6){
+  $('authMsg').textContent='Tên tài khoản từ 3 ký tự, mật khẩu từ 6 ký tự.';
+  return;
+ }
+ if(users.some(x=>x.u===u)){
+  $('authMsg').textContent='Tên tài khoản đã tồn tại.';
+  return;
+ }
+ users.push({u,p,role:'member',balance:0,blocked:false});
+ save();
+ $('authMsg').textContent='Tạo tài khoản thành công. Hãy đăng nhập.';
+ showAuth('login');
+ $('loginUser').value=u;
+}
+
+function logout(){
+ if(current)log('Đăng xuất');
+ current=null;
+ $('app').classList.add('hidden');
+ $('auth').classList.remove('hidden');
+}
+
+function refreshTop(){
+ let u=users.find(x=>x.u===current.u);
+ current=u;
+ $('balance').textContent=(u.balance||0).toLocaleString('vi-VN');
+}
+
+function isAdmin(){return current?.role==='admin'}
+function isStaff(){return ['admin','ctv'].includes(current?.role)}
+
+function page(name,btn){
+ activePage=name;
+ document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===name));
+ render();
+}
+
+function head(title,sub=''){
+ return `<div class="pagehead"><div><h1>${title}</h1><div class="muted">${sub}</div></div></div>`;
+}
+
+function card(title,value,desc){
+ return `<div class="card"><div class="muted">${title}</div><div class="stat">${value}</div><div class="muted small">${desc}</div></div>`;
+}
+
+function render(){
+ refreshTop();
+ let v='';
+ switch(activePage){
+
+ case'dashboard':
+ v=head('Tổng quan','Bảng điều khiển HAUZ SYSTEM')+
+ `<div class="grid">
+ ${card('Số dư của bạn',(current.balance||0).toLocaleString('vi-VN')+'đ','Ví demo')}
+ ${card('Key đang có',keys.filter(k=>k.owner===current.u&&!k.used).length,'Key chưa sử dụng')}
+ ${card('Phòng đã tạo',rooms.length,'Phòng trong bản demo')}
+ </div>
+ <div class="two" style="margin-top:15px">
+ <div class="card"><h3>Truy cập nhanh</h3><div class="actions">
+ <button onclick="page('buy')">Mua key</button>
+ <button class="secondary" onclick="page('live')">Vào Live mô phỏng</button>
+ <button class="secondary" onclick="page('deposit')">Nạp tiền</button>
+ </div></div>
+ <div class="card"><h3>Trạng thái hệ thống</h3>
+ <p class="good">● Giao diện demo đang hoạt động</p>
+ <p class="muted small">Dữ liệu lưu trên trình duyệt này, chưa đồng bộ giữa thiết bị.</p>
+ </div></div>`;
+ break;
+
+ case'bots':
+ v=head('Quản lý bot','Tạo bot quản lý và bot kiểm thử an toàn')+
+ `<div class="notice">Bot phá hoại, spam hoặc làm sập phòng không được hỗ trợ. Bot kiểm thử chỉ chạy trong phòng mô phỏng riêng.</div>
+ <div class="two">
+ <div class="card"><h3>Bot quản lý phòng</h3><p class="muted">Giải trí, kiểm duyệt, bảo vệ và ghi log.</p><button onclick="createBot('manager')">＋ Tạo bot quản lý</button></div>
+ <div class="card"><h3>Bot kiểm thử phòng</h3><p class="muted">Mô phỏng tải và kiểm tra cảnh báo trong sandbox.</p><button onclick="createBot('sandbox')">＋ Tạo bot kiểm thử</button></div>
+ </div>
+ <div class="card" style="margin-top:14px"><h3>Bot của hệ thống</h3>
+ ${bots.length?bots.map((b,i)=>`<div class="item between"><div><b>${b.name}</b><p class="muted small">${b.type==='manager'?'Quản lý phòng':'Kiểm thử sandbox'} · ${b.status?'Đang bật':'Đang tắt'}</p></div><div class="actions"><button class="secondary" onclick="toggleBot(${i})">${b.status?'Tắt':'Bật'}</button>${isAdmin()?`<button class="danger" onclick="deleteBot(${i})">Xóa</button>`:''}</div></div>`).join(''):'<p class="muted">Chưa có bot nào.</p>'}
+ </div>`;
+ break;
+
+ case'rooms':
+ v=head('Quản lý phòng','Tạo và quản lý phòng mô phỏng')+
+ `<div class="card"><label>Tên phòng</label><input id="roomName" placeholder="Ví dụ: Phòng Hauz vui vẻ"><div class="actions"><button onclick="createRoom()">Tạo phòng</button></div></div>
+ <div class="card" style="margin-top:14px"><h3>Danh sách phòng</h3>
+ ${rooms.map((r,i)=>`<div class="item between"><div><b>${r.name}</b><p class="muted small">Chủ phòng: ${r.owner} · ${r.status}</p></div><button class="secondary" onclick="roomAction(${i})">Đổi trạng thái</button></div>`).join('')||'<p class="muted">Chưa có phòng.</p>'}
+ </div>`;
+ break;
+
+ case'games':
+ v=head('Trò chơi','Trò chơi giải trí bằng điểm demo, không quy đổi tiền')+
+ `<div class="grid">
+ ${['Bài cào mô phỏng','Tài xỉu điểm demo','Oẳn tù tì','Đoán số','Vòng quay may mắn','Đố vui'].map((g,i)=>`<div class="card"><h3>${g}</h3><p class="muted small">Chơi vui trong hệ thống demo.</p><button onclick="playGame('${g}')">Chơi thử</button></div>`).join('')}
+ </div><div id="gameResult" class="notice hidden"></div>`;
+ break;
+
+ case'keys':
+ v=head('Kho key','Tạo key, xem key và kiểm tra trạng thái')+
+ `<div class="card"><div class="two">
+ <div><label>Số lượng key</label><input id="keyCount" type="number" min="1" max="100" value="1"></div>
+ <div><label>Thời hạn (phút)</label><input id="keyMinutes" type="number" min="1" value="30"></div>
+ </div><div class="actions"><button onclick="makeKeys()">Tạo key</button></div></div>
+ <div class="card" style="margin-top:14px"><h3>Key đã tạo</h3><div class="tablewrap"><table>
+ <thead><tr><th>Key</th><th>Chủ sở hữu</th><th>Hạn</th><th>Trạng thái</th></tr></thead>
+ <tbody>${keys.filter(k=>isAdmin()||k.owner===current.u).map(k=>`<tr><td>${k.code}</td><td>${k.owner}</td><td>${k.minutes} phút</td><td>${k.used?'Đã dùng':'Chưa dùng'}</td></tr>`).join('')}</tbody>
+ </table></div></div>`;
+ break;
+
+ case'live':
+ v=head('Live mô phỏng','Nhập key để mở phòng mô phỏng và nhặt xu thử nghiệm')+
+ `<div class="card"><label>Nhập key</label><input id="liveKey" placeholder="Nhập key của bạn">
+ <div class="actions"><button onclick="redeemKey()">Kiểm tra key</button></div>
+ <p id="keyMsg" class="small muted"></p></div>
+ <div id="liveArea" class="card hidden" style="margin-top:14px">
+ <h3>Phòng Live mô phỏng</h3>
+ <p class="muted small">Link mô phỏng: <span id="fakeLink"></span></p>
+ <div class="grid">${card('Xu trong phiên',`<span id="liveCoins">0</span>`,'Xu mô phỏng')}${card('Người nhận','0','Dữ liệu mô phỏng')}${card('Thời gian','Đang chạy','Phiên demo')}</div>
+ <div class="actions"><button onclick="chest()">Mở rương mô phỏng</button><button class="secondary" onclick="page('exchange')">Đến mục thu xu</button></div>
+ <p class="muted small">Mỗi lần mở rương tạo ngẫu nhiên 1–5.000 xu demo.</p>
+ </div>`;
+ break;
+
+ case'deposit':
+ v=head('Nạp tiền','Tạo yêu cầu nạp demo. Không chuyển tiền thật vào QR mẫu.')+
+ `<div class="card"><label>Số tiền muốn nạp (tối thiểu 10.000đ)</label>
+ <input id="depositAmount" type="number" min="10000" step="1000" value="10000">
+ <div class="actions"><button onclick="makeQR('deposit')">Tạo QR demo</button></div>
+ <div id="qrBox"></div></div>`;
+ break;
+
+ case'buy':
+ v=head('Mua key','Chọn gói thời hạn hoặc nhập số tiền tùy chỉnh')+
+ `<div class="grid">
+ ${[[10000,300],[15000,360],[20000,600]].map(x=>`<div class="card"><h3>${x[0].toLocaleString('vi-VN')}đ</h3><p class="muted">${x[1]} phút</p><button onclick="buyKey(${x[0]},${x[1]})">Chọn gói</button></div>`).join('')}
+ </div>
+ <div class="card" style="margin-top:14px"><label>Số tiền tùy chỉnh (10.000đ = 60 phút)</label>
+ <input id="customBuy" type="number" min="10000" step="1000" value="10000">
+ <button style="margin-top:12px" onclick="customBuy()">Mua theo số tiền</button></div>`;
+ break;
+
+ case'wallet':
+ v=head('Ví & giao dịch','Lịch sử nạp, mua key và điều chỉnh số dư')+
+ `<div class="card"><h3>Lịch sử giao dịch</h3><div class="tablewrap"><table>
+ <thead><tr><th>Thời gian</th><th>Loại</th><th>Số tiền</th><th>Trạng thái</th></tr></thead>
+ <tbody>${txs.filter(t=>isAdmin()||t.user===current.u).map(t=>`<tr><td>${t.time}</td><td>${t.type}</td><td>${t.amount.toLocaleString('vi-VN')}đ</td><td>${t.status}</td></tr>`).join('')}</tbody>
+ </table></div></div>`;
+ break;
+
+ case'exchange':
+ v=head('Thu mua xu','Gửi yêu cầu bán xu demo cho admin')+
+ `<div class="card"><p class="muted">Chỉ ghi nhận số xu mô phỏng. Không xác minh được giao dịch TikTok thật từ trang HTML.</p>
+ <label>Số xu muốn bán</label><input id="sellCoins" type="number" min="1" placeholder="Nhập số xu">
+ <button style="margin-top:12px" onclick="sellCoins()">Gửi yêu cầu thu xu</button>
+ <div id="sellResult" class="notice hidden"></div></div>`;
+ break;
+
+ case'members':
+ v=head('Thành viên','Phân quyền và quản lý tài khoản')+
+ `<div class="card"><div class="tablewrap"><table>
+ <thead><tr><th>Tài khoản</th><th>Vai trò</th><th>Số dư</th><th>Trạng thái</th><th>Thao tác</th></tr></thead>
+ <tbody>${users.filter(u=>isAdmin()||u.u===current.u).map(u=>`<tr><td>${u.u}</td><td>${u.role}</td><td>${(u.balance||0).toLocaleString('vi-VN')}đ</td><td>${u.blocked?'Bị khóa':'Hoạt động'}</td><td>${isAdmin()&&u.u!=='haune'?`<button class="secondary" onclick="changeRole('${u.u}')">Đổi quyền</button> <button class="secondary" onclick="credit('${u.u}')">Cộng tiền</button> <button class="danger" onclick="blockUser('${u.u}')">${u.blocked?'Mở khóa':'Khóa'}</button>`:'—'}</td></tr>`).join('')}</tbody>
+ </table></div></div>`;
+ break;
+
+ case'logs':
+ v=head('Nhật ký hoạt động','Log của các bot và thao tác trong hệ thống')+
+ `<div class="card"><div class="between"><h3>Nhật ký gần đây</h3><button class="secondary" onclick="logs=[];save();render()">Xóa log demo</button></div>
+ ${logs.map(l=>`<div class="item"><b>${l.msg}</b><p class="muted small">${l.time} · ${l.user}</p></div>`).join('')||'<p class="muted">Chưa có log.</p>'}
+ </div>`;
+ break;
+
+ case'security':
+ v=head('An ninh hệ thống','Các lớp bảo vệ cần triển khai ở máy chủ')+
+ `<div class="grid">
+ ${[['Giới hạn đăng nhập','Khóa tạm sau nhiều lần sai'],['Chống spam','Giới hạn tần suất gửi lệnh'],['Chống DDoS','CDN, WAF, rate limit ở máy chủ'],['Mã hóa','HTTPS, hash mật khẩu bằng Argon2id'],['Nhật ký','Ghi nhận sự kiện và cảnh báo'],['Quản lý phiên','Thu hồi phiên và đăng xuất thiết bị']].map(x=>`<div class="card"><h3>${x[0]}</h3><p class="muted small">${x[1]}</p><span class="tag">Khuyến nghị triển khai backend</span></div>`).join('')}
+ </div><div class="notice">Bản HTML này không thể tự chặn DDoS hoặc xác minh IP đáng tin cậy. Cần cấu hình CDN/WAF và API phía máy chủ.</div>`;
+ break;
+
+ case'admin':
+ v=head('Trung tâm Admin','Chỉ tài khoản admin được sử dụng')+
+ (isAdmin()?`<div class="grid">
+ ${card('Tổng thành viên',users.length,'Tài khoản')}
+ ${card('Tổng key',keys.length,'Key đã tạo')}
+ ${card('Bot',bots.length,'Bot hệ thống')}
+ </div>
+ <div class="two" style="margin-top:14px">
+ <div class="card"><h3>Cộng / trừ số dư</h3>
+ <label>Tài khoản</label><select id="targetUser">${users.map(u=>`<option>${u.u}</option>`).join('')}</select>
+ <label>Số tiền (có thể âm)</label><input id="creditAmount" type="number" value="10000">
+ <button style="margin-top:12px" onclick="adminCredit()">Xác nhận điều chỉnh</button>
+ </div>
+ <div class="card"><h3>Yêu cầu nạp chờ duyệt</h3>
+ ${txs.filter(t=>t.status==='Chờ duyệt').map(t=>`<div class="item"><b>${t.user}</b> · ${t.amount.toLocaleString('vi-VN')}đ <button onclick="approve(${t.id})">Duyệt demo</button></div>`).join('')||'<p class="muted">Không có yêu cầu.</p>'}
+ </div></div>
+ <div class="card" style="margin-top:14px"><h3>Gợi ý tính năng mở rộng</h3>
+ <div class="three">${['Phân quyền chi tiết','Duyệt giao dịch hai bước','Xuất báo cáo CSV','Thông báo Discord','Quản lý thiết bị đăng nhập','Sao lưu dữ liệu','Hạn mức CTV','Lịch sử chỉnh số dư','Khóa key từ xa','Cảnh báo bất thường','Quản lý phiên đăng nhập','API quản trị'].map(x=>`<span class="tag">${x}</span>`).join('')}</div>
+ </div>`:`<div class="notice">Bạn không có quyền truy cập trang này.</div>`);
+ break;
+ }
+ $('view').innerHTML=v;
+}
+
+function createBot(type){
+ if(!isAdmin()){alert('Chỉ admin được tạo bot.');return}
+ let name=prompt('Đặt tên bot:');
+ if(!name)return;
+ bots.push({name,type,status:true});
+ save();
+ log('Tạo bot '+name);
+ render();
+}
+
+function toggleBot(i){
+ bots[i].status=!bots[i].status;
+ save();
+ log('Đổi trạng thái bot '+bots[i].name);
+ render();
+}
+
+function deleteBot(i){
+ if(!isAdmin())return;
+ bots.splice(i,1);
+ save();
+ render();
+}
+
+function createRoom(){
+ let n=$('roomName').value.trim();
+ if(!n)return alert('Nhập tên phòng');
+ if(!isStaff())return alert('Chỉ admin/CTV được tạo phòng');
+ rooms.push({name:n,owner:current.u,status:'Hoạt động'});
+ save();
+ log('Tạo phòng '+n);
+ render();
+}
+
+function roomAction(i){
+ if(!isStaff())return alert('Không có quyền');
+ rooms[i].status=rooms[i].status==='Hoạt động'?'Tạm dừng':'Hoạt động';
+ save();
+ render();
+}
+
+function playGame(g){
+ let result=g==='Đố vui'?'Câu hỏi demo: 2 + 2 = 4.':
+ g==='Oẳn tù tì'?'Kết quả: '+['Bạn thắng','Hòa','Máy thắng'][Math.floor(Math.random()*3)]:
+ g==='Đoán số'?'Số bí mật lượt này: '+(1+Math.floor(Math.random()*10)):
+ g+': kết quả mô phỏng ngẫu nhiên.';
+ $('gameResult').textContent=result;
+ $('gameResult').classList.remove('hidden');
+ log('Chơi '+g);
+}
+
+function makeKeys(){
+ if(!isStaff())return alert('Chỉ admin/CTV được tạo key');
+ let n=Math.max(1,Math.min(100,Number($('keyCount').value)||1));
+ let m=Math.max(1,Number($('keyMinutes').value)||30);
+ for(let i=0;i<n;i++){
+  keys.unshift({
+   code:'HAUZ-'+Math.random().toString(36).slice(2,8).toUpperCase()+'-'+Math.random().toString(36).slice(2,6).toUpperCase(),
+   owner:current.u,minutes:m,used:false
+  });
+ }
+ save();
+ log('Tạo '+n+' key');
+ render();
+}
+
+function redeemKey(){
+ let code=$('liveKey').value.trim();
+ let k=keys.find(x=>x.code===code&&x.owner===current.u&&!x.used);
+ if(!k){
+  wrong++;
+  $('keyMsg').textContent='Key sai, đã thử '+wrong+'/5 lần.';
+  if(wrong>=5){
+   current.blocked=true;
+   save();
+   log('Tài khoản bị khóa sau 5 lần nhập key sai');
+   alert('Tài khoản demo đã bị khóa. Hãy nhờ admin mở khóa.');
+   logout();
+  }
+  return;
+ }
+ wrong=0;
+ k.used=true;
+ save();
+ $('keyMsg').textContent='Key hợp lệ! Đã mở phiên Live mô phỏng.';
+ $('liveArea').classList.remove('hidden');
+ $('fakeLink').textContent='hauz-demo.local/live/'+Math.random().toString(36).slice(2,10);
+ log('Kích hoạt key Live mô phỏng');
+}
+
+function chest(){
+ let n=1+Math.floor(Math.random()*5000);
+ liveCoins+=n;
+ $('liveCoins').textContent=liveCoins.toLocaleString('vi-VN');
+ log('Nhặt '+n+' xu mô phỏng');
+}
+
+function makeQR(kind){
+ let amount=Number($('depositAmount').value);
+ if(amount<10000)return alert('Tối thiểu 10.000đ');
+ let id='HZ'+Date.now();
+ txs.unshift({
+  id,user:current.u,type:'Nạp tiền demo',amount,status:'Chờ duyệt',
+  time:new Date().toLocaleString('vi-VN')
+ });
+ save();
+ $('qrBox').innerHTML=`<div class="qr">QR THANH TOÁN<br><span class="small">DEMO - KHÔNG CHUYỂN TIỀN THẬT</span><br>${amount.toLocaleString('vi-VN')}đ</div>
+ <p class="muted small" style="text-align:center">Mã yêu cầu: ${id}<br>QR demo hết hạn sau 5 phút.</p>
+ <p id="countdown" class="good" style="text-align:center;font-weight:bold">05:00</p>`;
+ let left=300;
+ clearInterval(qrTimer);
+ qrTimer=setInterval(()=>{
+  left--;
+  if(!$('countdown')){clearInterval(qrTimer);return}
+  $('countdown').textContent=left>0?String(Math.floor(left/60)).padStart(2,'0')+':'+String(left%60).padStart(2,'0'):'QR đã hết hạn';
+  if(left<=0)clearInterval(qrTimer);
+ },1000);
+ log('Tạo yêu cầu nạp demo '+amount);
+}
+
+function buyKey(amount,minutes){
+ if(current.balance<amount)return alert('Số dư không đủ. Hãy nạp tiền demo hoặc nhờ admin cộng số dư.');
+ current.balance-=amount;
+ keys.unshift({
+  code:'HAUZ-'+Math.random().toString(36).slice(2,10).toUpperCase(),
+  owner:current.u,minutes,used:false
+ });
+ txs.unshift({
+  user:current.u,type:'Mua key',amount,status:'Thành công',
+  time:new Date().toLocaleString('vi-VN')
+ });
+ save();
+ log('Mua key '+minutes+' phút');
+ alert('Mua key thành công. Xem key trong Kho key.');
+ render();
+}
+
+function customBuy(){
+ let a=Number($('customBuy').value);
+ if(a<10000)return alert('Tối thiểu 10.000đ');
+ buyKey(a,Math.floor(a/10000)*60);
+}
+
+function sellCoins(){
+ let n=Number($('sellCoins').value);
+ if(n<=0)return alert('Nhập số xu hợp lệ');
+ $('sellResult').textContent='Đã ghi nhận yêu cầu '+n.toLocaleString('vi-VN')+' xu demo. Admin cần kiểm tra thủ công; hệ thống không xác minh giao dịch TikTok thật.';
+ $('sellResult').classList.remove('hidden');
+ log('Gửi yêu cầu thu '+n+' xu demo');
+}
+
+function changeRole(u){
+ if(!isAdmin())return;
+ let x=users.find(z=>z.u===u);
+ x.role=x.role==='member'?'ctv':x.role==='ctv'?'member':'member';
+ save();
+ log('Đổi vai trò '+u+' thành '+x.role);
+ render();
+}
+
+function credit(u){
+ let a=Number(prompt('Số tiền muốn cộng:',10000));
+ if(!Number.isFinite(a)||a<=0)return;
+ let x=users.find(z=>z.u===u);
+ x.balance=(x.balance||0)+a;
+ txs.unshift({
+  user:u,type:'Admin cộng tiền',amount:a,status:'Thành công',
+  time:new Date().toLocaleString('vi-VN')
+ });
+ save();
+ log('Cộng '+a+'đ cho '+u);
+ render();
+}
+
+function blockUser(u){
+ if(!isAdmin())return;
+ let x=users.find(z=>z.u===u);
+ x.blocked=!x.blocked;
+ save();
+ log((x.blocked?'Khóa ':'Mở khóa ')+u);
+ render();
+}
+
+function adminCredit(){
+ let u=$('targetUser').value;
+ let a=Number($('creditAmount').value);
+ let x=users.find(z=>z.u===u);
+ if(!a||!x)return alert('Số tiền không hợp lệ');
+ if((x.balance||0)+a<0)return alert('Số dư không thể âm');
+ x.balance=(x.balance||0)+a;
+ txs.unshift({
+  user:u,type:'Admin điều chỉnh số dư',amount:a,status:'Thành công',
+  time:new Date().toLocaleString('vi-VN')
+ });
+ save();
+ log('Admin điều chỉnh số dư '+u+': '+a);
+ render();
+}
+
+function approve(id){
+ if(!isAdmin())return;
+ let t=txs.find(x=>x.id===id);
+ if(!t||t.status!=='Chờ duyệt')return;
+ t.status='Đã duyệt demo';
+ let u=users.find(x=>x.u===t.user);
+ u.balance=(u.balance||0)+t.amount;
+ save();
+ log('Duyệt nạp demo cho '+t.user);
+ render();
+}
+</script>
+</body>
+</html>
